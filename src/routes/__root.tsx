@@ -77,11 +77,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "مكتبتي - مشغل فيديوهات Google Drive" },
-      { name: "description", content: "منصة لتشغيل فيديوهات من رابط مجلد Google Drive عام مع تتبع المشاهدات والتفاعلات." },
-      { property: "og:title", content: "مكتبتي - مشغل فيديوهات Google Drive" },
-      { property: "og:description", content: "شغّل فيديوهات مجلد Drive عام، تابع مشاهداتك، واحفظ لقطاتك المفضلة." },
+      { title: "تشغيل" },
+      { name: "description", content: "منصة لتشغيل فيديوهات مع تتبع المشاهدات والتفاعلات." },
+      { property: "og:title", content: "تشغيل" },
+      { property: "og:description", content: "منصة لتشغيل فيديوهات مع تتبع المشاهدات والتفاعلات." },
       { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "تشغيل" },
+      { name: "twitter:description", content: "منصة لتشغيل فيديوهات مع تتبع المشاهدات والتفاعلات." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/3sDPBYu4JtThnszxLr7uvFXYYs63/social-images/social-1780451704305-generated_image_(47).webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/3sDPBYu4JtThnszxLr7uvFXYYs63/social-images/social-1780451704305-generated_image_(47).webp" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       {
