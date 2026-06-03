@@ -150,7 +150,7 @@ function Watch() {
 
         {data.stats.tags.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {data.stats.tags.map((t: string) => (
+            {data.stats.tags.map((t) => (
               <Badge key={t} variant="secondary">{t}</Badge>
             ))}
           </div>
