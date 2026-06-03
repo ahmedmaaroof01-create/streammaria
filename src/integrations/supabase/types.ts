@@ -14,7 +14,230 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      folders: {
+        Row: {
+          content_type: string | null
+          created_at: string
+          drive_folder_id: string
+          drive_url: string
+          id: string
+          last_synced_at: string | null
+        }
+        Insert: {
+          content_type?: string | null
+          created_at?: string
+          drive_folder_id: string
+          drive_url: string
+          id?: string
+          last_synced_at?: string | null
+        }
+        Update: {
+          content_type?: string | null
+          created_at?: string
+          drive_folder_id?: string
+          drive_url?: string
+          id?: string
+          last_synced_at?: string | null
+        }
+        Relationships: []
+      }
+      interactions: {
+        Row: {
+          created_at: string
+          id: string
+          type: string
+          value: string | null
+          video_id: string
+          visitor_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          type: string
+          value?: string | null
+          video_id: string
+          visitor_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          type?: string
+          value?: string | null
+          video_id?: string
+          visitor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interactions_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "interactions_visitor_id_fkey"
+            columns: ["visitor_id"]
+            isOneToOne: false
+            referencedRelation: "visitors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      snapshots: {
+        Row: {
+          created_at: string
+          id: string
+          image_data: string | null
+          position_seconds: number
+          video_id: string
+          visitor_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_data?: string | null
+          position_seconds: number
+          video_id: string
+          visitor_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_data?: string | null
+          position_seconds?: number
+          video_id?: string
+          visitor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "snapshots_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "snapshots_visitor_id_fkey"
+            columns: ["visitor_id"]
+            isOneToOne: false
+            referencedRelation: "visitors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      videos: {
+        Row: {
+          created_at: string
+          drive_file_id: string
+          duration: number | null
+          folder_id: string
+          id: string
+          mime_type: string | null
+          name: string
+          size: number | null
+          thumbnail_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          drive_file_id: string
+          duration?: number | null
+          folder_id: string
+          id?: string
+          mime_type?: string | null
+          name: string
+          size?: number | null
+          thumbnail_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          drive_file_id?: string
+          duration?: number | null
+          folder_id?: string
+          id?: string
+          mime_type?: string | null
+          name?: string
+          size?: number | null
+          thumbnail_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "videos_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      visitors: {
+        Row: {
+          created_at: string
+          id: string
+          user_agent: string | null
+          visitor_key: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_agent?: string | null
+          visitor_key: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_agent?: string | null
+          visitor_key?: string
+        }
+        Relationships: []
+      }
+      watch_sessions: {
+        Row: {
+          completed: boolean | null
+          ended_at: string | null
+          id: string
+          last_position: number | null
+          started_at: string
+          video_id: string
+          visitor_id: string | null
+          watched_seconds: number | null
+        }
+        Insert: {
+          completed?: boolean | null
+          ended_at?: string | null
+          id?: string
+          last_position?: number | null
+          started_at?: string
+          video_id: string
+          visitor_id?: string | null
+          watched_seconds?: number | null
+        }
+        Update: {
+          completed?: boolean | null
+          ended_at?: string | null
+          id?: string
+          last_position?: number | null
+          started_at?: string
+          video_id?: string
+          visitor_id?: string | null
+          watched_seconds?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "watch_sessions_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "watch_sessions_visitor_id_fkey"
+            columns: ["visitor_id"]
+            isOneToOne: false
+            referencedRelation: "visitors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
