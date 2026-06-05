@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      blocked_visitors: {
+        Row: {
+          blocked_at: string
+          reason: string | null
+          visitor_id: string
+        }
+        Insert: {
+          blocked_at?: string
+          reason?: string | null
+          visitor_id: string
+        }
+        Update: {
+          blocked_at?: string
+          reason?: string | null
+          visitor_id?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          visitor_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          visitor_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          visitor_id?: string | null
+        }
+        Relationships: []
+      }
       folders: {
         Row: {
           content_type: string | null
@@ -125,11 +167,43 @@ export type Database = {
           },
         ]
       }
+      video_chapters: {
+        Row: {
+          created_at: string
+          description: string | null
+          end_seconds: number | null
+          id: string
+          start_seconds: number
+          title: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          end_seconds?: number | null
+          id?: string
+          start_seconds?: number
+          title: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          end_seconds?: number | null
+          id?: string
+          start_seconds?: number
+          title?: string
+          video_id?: string
+        }
+        Relationships: []
+      }
       videos: {
         Row: {
+          chapters_generated: boolean | null
           created_at: string
           drive_file_id: string
           duration: number | null
+          duration_seconds: number | null
           folder_id: string
           id: string
           mime_type: string | null
@@ -138,9 +212,11 @@ export type Database = {
           thumbnail_url: string | null
         }
         Insert: {
+          chapters_generated?: boolean | null
           created_at?: string
           drive_file_id: string
           duration?: number | null
+          duration_seconds?: number | null
           folder_id: string
           id?: string
           mime_type?: string | null
@@ -149,9 +225,11 @@ export type Database = {
           thumbnail_url?: string | null
         }
         Update: {
+          chapters_generated?: boolean | null
           created_at?: string
           drive_file_id?: string
           duration?: number | null
+          duration_seconds?: number | null
           folder_id?: string
           id?: string
           mime_type?: string | null
