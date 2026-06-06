@@ -10,8 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StatsRouteImport } from './routes/stats'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as WatchIdRouteImport } from './routes/watch.$id'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as ApiPublicSyncRouteImport } from './routes/api/public/sync'
@@ -22,14 +22,14 @@ const StatsRoute = StatsRouteImport.update({
   path: '/stats',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WatchIdRoute = WatchIdRouteImport.update({
@@ -55,29 +55,29 @@ const ApiPublicChatRoute = ApiPublicChatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
   '/stats': typeof StatsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/watch/$id': typeof WatchIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/api/public/chat': typeof ApiPublicChatRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
   '/stats': typeof StatsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/watch/$id': typeof WatchIdRoute
+  '/admin': typeof AdminIndexRoute
   '/api/public/chat': typeof ApiPublicChatRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
   '/stats': typeof StatsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/watch/$id': typeof WatchIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/api/public/chat': typeof ApiPublicChatRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
 }
@@ -85,37 +85,37 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
     | '/stats'
     | '/admin/dashboard'
     | '/watch/$id'
+    | '/admin/'
     | '/api/public/chat'
     | '/api/public/sync'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/stats'
     | '/admin/dashboard'
     | '/watch/$id'
+    | '/admin'
     | '/api/public/chat'
     | '/api/public/sync'
   id:
     | '__root__'
     | '/'
-    | '/admin'
     | '/stats'
     | '/admin/dashboard'
     | '/watch/$id'
+    | '/admin/'
     | '/api/public/chat'
     | '/api/public/sync'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRouteWithChildren
   StatsRoute: typeof StatsRoute
   WatchIdRoute: typeof WatchIdRoute
+  AdminIndexRoute: typeof AdminIndexRoute
   ApiPublicChatRoute: typeof ApiPublicChatRoute
   ApiPublicSyncRoute: typeof ApiPublicSyncRoute
 }
@@ -129,18 +129,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StatsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/watch/$id': {
@@ -174,21 +174,11 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AdminRouteChildren {
-  AdminDashboardRoute: typeof AdminDashboardRoute
-}
-
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminDashboardRoute: AdminDashboardRoute,
-}
-
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRouteWithChildren,
   StatsRoute: StatsRoute,
   WatchIdRoute: WatchIdRoute,
+  AdminIndexRoute: AdminIndexRoute,
   ApiPublicChatRoute: ApiPublicChatRoute,
   ApiPublicSyncRoute: ApiPublicSyncRoute,
 }
