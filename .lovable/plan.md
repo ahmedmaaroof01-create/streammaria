@@ -1,91 +1,77 @@
-## خطة تطوير منصة "ماريا"
+# خطة تنفيذ منصة "ماريا"
 
-منصة عرض فيديوهات من مجلد Google Drive عام، بصفحة رئيسية للزوار + لوحة إدارة محمية + شات بوت مساعد.
+سأنفذ الخطة الشاملة دون مفتاح Google API (استخدام طريقة scraping محسّنة مع pagination)، بالإضافة إلى تحسينات PWA والمشغل والسلايدر.
 
-### 1) إعادة تسمية وهوية الموقع
+## 1) الهوية و SEO
+- تغيير الاسم إلى **ماريا** في `__root.tsx` (title, og:title, description)
+- تحديث `DynamicLogo` للهوية الجديدة
+- توليد أيقونات PWA: `icon-192.png`, `icon-512.png`, `apple-touch-icon.png`, `favicon`
 
-- تغيير اسم الموقع إلى **"ماريا"** في `__root.tsx` (title, og:title, meta).
-- تحديث `DynamicLogo` ليعرض اسم "ماريا".
-- توليد أيقونات PWA (192, 512) باسم ماريا.
+## 2) PWA كامل (بدون offline)
+- `public/manifest.webmanifest` مع: name "ماريا", short_name, theme_color, background_color, display: standalone, icons, lang: ar, dir: rtl
+- meta tags في `__root.tsx`: manifest, theme-color, apple-touch-icon, apple-mobile-web-app-capable
+- مكوّن `InstallPrompt.tsx` يستمع لـ `beforeinstallprompt` ويعرض زر تثبيت أنيق
+- بدون service worker (حسب توجيهات Lovable)
 
-### 2) PWA احترافي كامل (بدون offline)
+## 3) استيراد Google Drive محسّن (بدون API key)
+- إعادة كتابة scraper في `drive.functions.ts`:
+  - استخدام endpoint `https://drive.google.com/embeddedfolderview?id={id}#list` يعطي قائمة أكمل
+  - استخراج كل الفيديوهات + thumbnails بـ regex محسّن
+  - upsert على `drive_file_id` (unique constraint موجود)
+- حفظ `folder_id` في جدول `folders` (موجود)
+- مزامنة دورية كل 24 ساعة عبر `/api/public/sync`
 
-- إنشاء `public/manifest.webmanifest` مع: name="ماريا", short_name, theme_color, background_color, display=standalone, icons, lang=ar, dir=rtl.
-- إنشاء أيقونات `public/icon-192.png`, `public/icon-512.png`, `public/apple-touch-icon.png`.
-- إضافة في `__root.tsx`: link manifest, apple-touch-icon, theme-color, apple-mobile-web-app-capable, apple-mobile-web-app-title.
-- مكوّن `InstallPrompt.tsx` يستمع لـ `beforeinstallprompt` ويعرض زر "تثبيت التطبيق" + تعليمات iOS (Add to Home Screen).
-- **بدون service worker** (لا offline، لا vite-plugin-pwa) — حسب توجيه PWA skill.
+## 4) الشاشة الرئيسية الجديدة (عامة، بدون login)
+- **Hero Slider** أعلى الصفحة: يعرض آخر 8-10 فيديوهات مع تشغيل تلقائي للتريلر (iframe Drive `autoplay=1&mute=1`)
+  - استخدام `embla-carousel` (موجود) + `embla-carousel-autoplay`
+  - تبديل كل 8 ثوانٍ، أزرار تنقل، نقاط مؤشرة
+- **شبكة الفيديوهات** أسفل السلايدر مع thumbnails + pagination (50/صفحة) أو infinite scroll
+- إخفاء واجهة الاستيراد من الصفحة الرئيسية (تنتقل إلى `/admin`)
+- تصميم احترافي: dark theme، gradients، hover effects، responsive
 
-### 3) لوحة إدارة محمية برمز 6969
+## 5) مشغل الفيديو المحسّن `/watch/$id`
+- استبدال المشغل بـ Drive iframe: `https://drive.google.com/file/d/{id}/preview`
+- يعمل بدون login، بدون "تعذر تشغيل"
+- **Responsive**: `aspect-video` + `max-h-[70vh]` على الموبايل
+- زر **ملء الشاشة** مخصص يستخدم Fullscreen API على حاوية الـ iframe
+- شريط أدوات سفلي للموبايل: إعجاب، حفظ، مشاركة، fullscreen
+- استبدال قسم "الاهتمامات/الوسوم" بـ **زر شات بوت ماريا** عائم
+- تتبع المشاهدة عبر `visitor_id` (موجود)
+- فصول AI تلقائية باستخدام `google/gemini-3-flash-preview` عبر Lovable AI (مجاني، بدون مفتاح)
 
-- صفحة `/admin` تطلب كلمة المرور `6969` فقط (بدون اسم مستخدم).
-- حفظ token بسيط في `sessionStorage` بعد الإدخال الصحيح.
-- حماية `/admin/*` بالتحقق من الـ token (client-side gate كافٍ لأن كل عمليات الكتابة الفعلية محمية في الـ server functions بـ secret منفصل).
-- إضافة `ADMIN_PASSCODE=6969` كـ secret على السيرفر، وكل server fn حساس يطلب الـ passcode في الـ payload ويتحقق منه.
-- صفحات الإدارة: المزامنة (الرابط الحالي + زر مزامنة)، الفيديوهات (قائمة)، نشاط المستخدمين (آخر الجلسات + ما يشاهدون)، الشات بوت (سجل المحادثات).
+## 6) لوحة الأدمن `/admin` (كلمة سر فقط)
+- صفحة دخول بكلمة سر `6969` (secret: `ADMIN_PASSCODE`)
+- token في `sessionStorage` + التحقق في كل serverFn admin عبر `adminToken` parameter
+- تبويبات:
+  - **المجلدات**: إضافة/حذف رابط Drive، مزامنة يدوية
+  - **الفيديوهات**: قائمة كاملة مع إحصائيات
+  - **النشاط**: قائمة الزوار، آخر فيديو شاهده كل زائر، الكل تاريخياً
+  - **زائر مفرد** `/admin/visitor/$id`: تاريخ مشاهداته الكامل + محادثاته
+  - **حظر**: إضافة/إزالة `visitor_id` من `blocked_visitors`
 
-### 4) استيراد كامل لكل الفيديوهات من Google Drive (10,000+)
+## 7) شات بوت ماريا
+- زر عائم في الزاوية + صفحة `/chat`
+- streaming من Lovable AI (`google/gemini-3-flash-preview`)
+- system prompt عربي/بغدادي ودود يساعد في اقتراح أفلام
+- حفظ المحادثات في `chat_messages` مرتبطة بـ `visitor_id`
+- ضمن سياسات الأمان الافتراضية
 
-المشكلة الحالية: scraping للصفحة العامة يعيد ~200 فقط.
+## 8) قاعدة البيانات
+الجداول الجديدة (`video_chapters`, `chat_messages`, `blocked_visitors`) موجودة من migration سابق.
+- إضافة سياسات INSERT للسماح بالكتابة من الخادم (admin client يتخطى RLS، لكن لتنظيف)
+- إضافة GRANTs للجداول الجديدة
 
-الحل: استخدام **Google Drive API v3** بـ API Key عام مع pagination:
-- طلب من المستخدم إدخال `GOOGLE_API_KEY` (مفتاح public للقراءة فقط، يحصل عليه من Google Cloud Console).
-- استدعاء `https://www.googleapis.com/drive/v3/files?q='<folderId>'+in+parents&pageSize=1000&pageToken=...&fields=files(id,name,mimeType,size,thumbnailLink,videoMediaMetadata),nextPageToken` في حلقة حتى انتهاء `nextPageToken`.
-- **حفظ رابط المجلد والـ folder_id في جدول `folders`** (موجود أصلاً لكن غير مُستخدم بشكل صحيح بعد المزامنة) + تحديث `last_synced_at`.
-- إدراج/تحديث الفيديوهات batched (upsert على `drive_file_id`).
-- pg_cron الموجود يستدعي السيرفر كل 24 ساعة → يقرأ آخر folder من DB ويعيد المزامنة تلقائياً.
+## 9) الأسرار المطلوبة
+فقط `ADMIN_PASSCODE` (قيمة `6969`). Lovable AI متاح عبر `LOVABLE_API_KEY` الموجود.
 
-### 5) الصفحة الرئيسية (عامة، بدون تسجيل دخول)
+## ملاحظات تقنية
+- جميع server functions تستخدم `supabaseAdmin` (admin client)
+- التحقق من admin token داخل كل serverFn حساس
+- التريلر يستخدم iframe Drive مع `autoplay=1` (يحتاج mute للموبايل)
+- استخدام `react-query` للـ caching والتحديث التلقائي
+- معالجة runtime error #418 (hydration) عبر `<ClientOnly>` للسلايدر
 
-- **سلايدر Hero** (carousel) في الأعلى: يعرض أول 8-10 فيديوهات مع تشغيل **تريلر تلقائي صامت** (iframe من Drive مع `autoplay=1&mute=1`) عند ظهور الشريحة، transitions كل 6 ثوان.
-- **شبكة الفيديوهات** بـ thumbnails (من `thumbnailLink` الذي يعيده Drive API).
-- **توليد لقطات تلقائية**: server fn يأخذ أول 4-5 لقطات من كل فيديو عبر `https://drive.google.com/thumbnail?id=<id>&sz=w800` بأحجام/أوقات مختلفة ويحفظها في `snapshots` (auto-generated flag).
-- pagination/infinite scroll لأن عدد الفيديوهات كبير (10K+).
-- بحث + فلترة.
+## خارج النطاق
+- محتوى للبالغين، شات بدون قيود، offline mode
 
-### 6) صفحة المشاهدة محسّنة `/watch/$id`
-
-- مشغل Drive iframe responsive مع نسبة 16:9، **إطار مخصص للهاتف** (max-h-[60vh] على الموبايل، مع controls واضحة أسفله).
-- **تقسيم الفيديو إلى فصول/مقاطع**: عند فتح الفيديو لأول مرة، يستدعي server fn يستخدم Lovable AI (gemini-3-flash) لتوليد تقسيم زمني افتراضي بناء على المدة + اسم الفيديو (مثلاً 8-10 chapters مع عنوان ووصف لكل واحد ووقت بدء). يُحفظ في جدول جديد `video_chapters`.
-- قائمة الفصول جانب المشغل، النقر يقفز للوقت.
-- تتبع المشاهدة (موجود) + ربط `visitor_id` بكل جلسة لعرضها للأدمن.
-
-### 7) شات بوت "ماريا" (يستبدل قسم الاهتمامات)
-
-- زر floating في الزاوية + صفحة `/chat`.
-- يستخدم **Lovable AI** (gemini-3-flash-preview) عبر edge function للـ streaming.
-- System prompt: مساعدة عربية ودودة بلهجة عراقية تساعد المستخدم في تصفّح فيديوهات الموقع، تعرف عناوين الفيديوهات الموجودة (نمرر لها أحدث N عنوان كـ context)، تجيب على أسئلة عامة. **ضمن سياسات السلامة الافتراضية للنموذج** — لا تعديل/تجاوز للفلاتر.
-- حفظ كل محادثة في جدول `chat_messages` مع `visitor_id` ليراها الأدمن.
-
-### 8) رؤية الأدمن للنشاط
-
-- صفحة `/admin/activity`: قائمة الزوار (`visitors`) مع آخر فيديو شاهدوه، مدة المشاهدة، آخر سؤال للشات بوت.
-- صفحة `/admin/visitor/$id`: تاريخ المشاهدة الكامل + كل رسائل الشات.
-- زر "حذف بيانات الزائر" يمسح كل interactions/sessions/chats للـ visitor.
-- زر "حظر visitor_id" يضيفه لجدول `blocked_visitors`؛ الواجهة تتحقق وتمنعه من تشغيل الفيديوهات والشات.
-
-### 9) جداول جديدة (migration)
-
-- `video_chapters(id, video_id, start_seconds, end_seconds, title, description)`
-- `chat_messages(id, visitor_id, role, content, created_at)`
-- `blocked_visitors(visitor_id, blocked_at, reason)`
-- تحديث RLS: قراءة عامة للـ chapters فقط؛ الباقي محمي.
-
-### 10) إصلاحات سريعة ضمنية
-
-- إصلاح hydration mismatch في `last_synced_at` (استخدام `suppressHydrationWarning` أو تأجيل format للـ client).
-- إصلاح تشغيل التريلر (iframe preview بدلاً من `<video>` مباشر).
-
-### ما هو خارج النطاق
-
-- محتوى للبالغين / Adult content — لن تُبنى المنصة لاستضافة هذا النوع.
-- شات بوت بدون فلتر / محتوى جنسي صريح — مخالف لسياسات السلامة، الشات بوت سيكون ودوداً ومساعداً ضمن السياسات الافتراضية.
-- Offline mode — PWA installable فقط، بدون service worker (حسب توجيهات Lovable PWA).
-
-### الأسرار المطلوبة
-
-- `GOOGLE_API_KEY` — مفتاح Google Cloud (Drive API enabled) لقراءة المجلدات العامة بشكل كامل مع pagination.
-- `ADMIN_PASSCODE` — قيمة `6969`.
-- `LOVABLE_API_KEY` — موجود مسبقاً للشات بوت.
-
-هل تعتمد الخطة لأبدأ التنفيذ؟
+هل أبدأ التنفيذ؟
