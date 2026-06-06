@@ -11,6 +11,9 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { InstallPrompt } from "@/components/InstallPrompt";
+import { ChatWidget } from "@/components/ChatWidget";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -72,27 +75,30 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "تشغيل" },
-      { name: "description", content: "منصة لتشغيل فيديوهات مع تتبع المشاهدات والتفاعلات." },
-      { property: "og:title", content: "تشغيل" },
-      { property: "og:description", content: "منصة لتشغيل فيديوهات مع تتبع المشاهدات والتفاعلات." },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { title: "ماريا — منصة الأفلام" },
+      { name: "description", content: "ماريا — منصة لمشاهدة الأفلام والفيديوهات بتجربة احترافية." },
+      { name: "theme-color", content: "#0b0814" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "ماريا" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { property: "og:title", content: "ماريا — منصة الأفلام" },
+      { property: "og:description", content: "شاهد أفلامك المفضلة بتجربة احترافية." },
       { property: "og:type", content: "website" },
-      { name: "twitter:title", content: "تشغيل" },
-      { name: "twitter:description", content: "منصة لتشغيل فيديوهات مع تتبع المشاهدات والتفاعلات." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/3sDPBYu4JtThnszxLr7uvFXYYs63/social-images/social-1780451704305-generated_image_(47).webp" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/3sDPBYu4JtThnszxLr7uvFXYYs63/social-images/social-1780451704305-generated_image_(47).webp" },
+      { property: "og:site_name", content: "ماريا" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "icon", href: "/icon-512.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/icon-512.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -103,7 +109,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="ar" dir="rtl">
+    <html lang="ar" dir="rtl" className="dark">
       <head>
         <HeadContent />
       </head>
@@ -122,6 +128,9 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <ChatWidget />
+      <InstallPrompt />
+      <Toaster />
     </QueryClientProvider>
   );
 }

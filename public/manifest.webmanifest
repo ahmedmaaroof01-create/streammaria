@@ -1,0 +1,18 @@
+{
+  "name": "ماريا",
+  "short_name": "ماريا",
+  "description": "ماريا — منصة مشاهدة الأفلام والفيديوهات",
+  "lang": "ar",
+  "dir": "rtl",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b0814",
+  "theme_color": "#0b0814",
+  "start_url": "/",
+  "scope": "/",
+  "icons": [
+    { "src": "/icon-512.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
