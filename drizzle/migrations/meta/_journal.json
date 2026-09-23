@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790160327491,
+      "tag": "0000_maria_notifications_and_summaries",
+      "breakpoints": true
+    }
+  ]
+}

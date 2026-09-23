@@ -125,6 +125,57 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          dedupe_key: string | null
+          id: string
+          read_at: string | null
+          title: string
+          type: string
+          video_id: string | null
+          visitor_id: string | null
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          dedupe_key?: string | null
+          id?: string
+          read_at?: string | null
+          title: string
+          type: string
+          video_id?: string | null
+          visitor_id?: string | null
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          dedupe_key?: string | null
+          id?: string
+          read_at?: string | null
+          title?: string
+          type?: string
+          video_id?: string | null
+          visitor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_visitor_id_fkey"
+            columns: ["visitor_id"]
+            isOneToOne: false
+            referencedRelation: "visitors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       snapshots: {
         Row: {
           created_at: string
@@ -199,6 +250,7 @@ export type Database = {
       }
       videos: {
         Row: {
+          ai_summary: string | null
           chapters_generated: boolean | null
           created_at: string
           drive_file_id: string
@@ -212,6 +264,7 @@ export type Database = {
           thumbnail_url: string | null
         }
         Insert: {
+          ai_summary?: string | null
           chapters_generated?: boolean | null
           created_at?: string
           drive_file_id: string
@@ -225,6 +278,7 @@ export type Database = {
           thumbnail_url?: string | null
         }
         Update: {
+          ai_summary?: string | null
           chapters_generated?: boolean | null
           created_at?: string
           drive_file_id?: string
