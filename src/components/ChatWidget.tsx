@@ -4,13 +4,20 @@ import ReactMarkdown from "react-markdown";
 import { getVisitorKey } from "@/lib/visitor";
 
 type Msg = { role: "user" | "assistant"; content: string };
+type DetailMode = "مختصر" | "مباشر" | "تفصيلي";
 
 export function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [detailMode, setDetailMode] = useState<DetailMode>("مباشر");
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const currentVideoId =
+    typeof window !== "undefined"
+      ? window.location.pathname.match(/^\/watch\/([^/]+)/)?.[1] ?? null
+      : null;
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -27,7 +34,7 @@ export function ChatWidget() {
       const res = await fetch("/api/public/chat", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ messages: next, visitorKey: getVisitorKey() }),
+        body: JSON.stringify({ messages: next, visitorKey: getVisitorKey(), currentVideoId, detailMode }),
       });
       if (!res.ok || !res.body) throw new Error("فشل الاتصال");
       const reader = res.body.getReader();
@@ -93,7 +100,9 @@ export function ChatWidget() {
                 </div>
                 <div>
                   <div className="text-sm font-semibold">ماريا</div>
-                  <div className="text-[10px] text-muted-foreground">دردشة مباشرة</div>
+                  <div className="text-[10px] text-muted-foreground">
+                    {currentVideoId ? "سوالف عن الفيلم الجاري" : "سوالف أفلام عراقية"}
+                  </div>
                 </div>
               </div>
               <button onClick={() => setOpen(false)} aria-label="إغلاق" className="rounded p-1 hover:bg-muted">
@@ -104,7 +113,7 @@ export function ChatWidget() {
             <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto p-3">
               {msgs.length === 0 && (
                 <div className="rounded-xl bg-muted/50 p-3 text-sm">
-                  هلا والله 👋 آني ماريا، اشلونك؟ تحب أساعدك تختار فيلم ينعجبك؟
+                  هلا والله، آني ماريا. {currentVideoId ? "أحچي لك عن الفيلم اللي دا تشوفه، وبالطريقة اللي تريحك." : "أساعدك تختار من أفلام المنصة."}
                 </div>
               )}
               {msgs.map((m, i) => (
@@ -131,12 +140,25 @@ export function ChatWidget() {
               ))}
             </div>
 
+            <div className="flex items-center gap-1 border-t px-2 pt-2 text-[11px] text-muted-foreground">
+              <span>طريقة الوصف:</span>
+              {(["مختصر", "مباشر", "تفصيلي"] as DetailMode[]).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => setDetailMode(mode)}
+                  className={`rounded-full px-2 py-1 transition ${detailMode === mode ? "bg-primary text-primary-foreground" : "bg-muted hover:bg-muted/80"}`}
+                >
+                  {mode}
+                </button>
+              ))}
+            </div>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 send();
               }}
-              className="flex items-center gap-2 border-t p-2"
+              className="flex items-center gap-2 p-2"
             >
               <input
                 value={input}
